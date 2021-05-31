@@ -1,4 +1,23 @@
+apply plugin: 'com.android.library'
 apply plugin: 'maven'
+
+ext {
+    PUBLISH_GROUP_ID = "io.github.wzy911229"        //项目包名
+    PUBLISH_ARTIFACT_ID = 'tms-rule'            //项目名
+    PUBLISH_VERSION = "0.0.2"                    //版本号
+}
+
+buildscript {
+    repositories {
+        jcenter() //指定maven镜像，下同
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.3'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
 
 
 android {
@@ -9,7 +28,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "0.0.2"
 
     }
     buildTypes {
@@ -18,44 +37,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    useLibrary 'org.apache.http.legacy'
 
+
+    useLibrary 'org.apache.http.legacy'
+}
+
+
+repositories {
+    google()
+    mavenCentral()
 
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation "com.facebook.react:react-native:+"  // From node_modules
 }
 
 
-apply from: file("./dependencyPlugin.gradle"); applyNativeModulesAppBuildGradle(project)
+// apply from: file("./dependencyPlugin.gradle"); applyNativeModulesAppBuildGradle(project)
 
-
-
-afterEvaluate {
-    publishing {
-        publications {
-            // Creates a Maven publication called "release".
-            release(MavenPublication) {
-                // Applies the component for the release build variant.
-                from components.release
-
-                // You can then customize attributes of the publication as shown below.
-                groupId = 'wzy911229.github.io'
-                artifactId = 'final'
-                version = '1.0.0'
-            }
-            // Creates a Maven publication called “debug”.
-//            debug(MavenPublication) {
-//                // Applies the component for the debug build variant.
-//                from components.debug
-//
-//                groupId = 'wzy911229.github.io'
-//                artifactId = 'final-debug'
-//                version = '1.0'
-//            }
-        }
-    }
-}
+apply from: "./publish-mavencentral.gradle"

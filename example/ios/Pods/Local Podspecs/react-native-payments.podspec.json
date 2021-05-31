@@ -1,0 +1,101 @@
+{
+  "name": "react-native-payments",
+  "version": "3.2.1",
+  "summary": "pay libs",
+  "description": "React Native apps are built using the React JS\nframework, and render directly to native UIKit\nelements using a fully asynchronous architecture.\nThere is no browser and no HTML. We have picked what\nwe think is the best set of features from these and\nother technologies to build what we hope to become\nthe best product development framework available,\nwith an emphasis on iteration speed, developer\ndelight, continuity of technology, and absolutely\nbeautiful and fast products with no compromises in\nquality or capability.",
+  "homepage": "https://terminus-org.app.terminus.io/wb/mobile/react-native-payments",
+  "license": "MIT",
+  "authors": "zhiyu",
+  "source": {
+    "git": "https://terminus-org.app.terminus.io/wb/mobile/react-native-payments"
+  },
+  "requires_arc": true,
+  "platforms": {
+    "ios": "9.0"
+  },
+  "libraries": "z",
+  "frameworks": [
+    "AssetsLibrary",
+    "LocalAuthentication",
+    "MessageUI",
+    "CoreMotion",
+    "SystemConfiguration",
+    "CFNetwork"
+  ],
+  "static_framework": true,
+  "dependencies": {
+    "React": [
+
+    ],
+    "tms": [
+      "0.0.3"
+    ]
+  },
+  "default_subspecs": "BaseLib",
+  "subspecs": [
+    {
+      "name": "BaseLib",
+      "source_files": "ios/**/*.{h,m}"
+    },
+    {
+      "name": "AliPaylib",
+      "source_files": "platforms/alipay/ios/*.{h,m}",
+      "dependencies": {
+        "ZYAlipaySDK-noutdid": [
+          "15.8.3"
+        ]
+      }
+    },
+    {
+      "name": "UnionPayLib",
+      "source_files": "platforms/union/ios/*.{h,m}",
+      "dependencies": {
+        "LPUnionPay": [
+          "1.0.1"
+        ]
+      }
+    },
+    {
+      "name": "ApplePayLib",
+      "source_files": "platforms/apple/ios/*.{h,m}",
+      "dependencies": {
+        "UPAPayPluginLib": [
+          "1.0.0"
+        ]
+      }
+    },
+    {
+      "name": "WeiXinPayLib",
+      "source_files": "platforms/wechat/ios/*.{h,m}",
+      "dependencies": {
+        "WechatOpenSDK": [
+          "1.8.7.1"
+        ]
+      }
+    },
+    {
+      "name": "UnifyPayLib",
+      "source_files": [
+        "platforms/unify/ios/**/*.{h,m}",
+        "platforms/unify/ios/payments/**/*.{h,m}",
+        "platforms/unify/ios/lib/include/**/*.{h,m}"
+      ],
+      "vendored_libraries": "platforms/unify/ios/lib/*.a"
+    },
+    {
+      "name": "CCAvenuePayLib",
+      "source_files": "platforms/ccavenue/ios/*.{h,m}",
+      "vendored_frameworks": "platforms/ccavenue/ios/lib/*.framework"
+    },
+    {
+      "name": "StripePayLib",
+      "source_files": "platforms/stripe/ios/**/*.{h,m}",
+      "resources": "platforms/stripe/ios/lib/*.bundle",
+      "dependencies": {
+        "Stripe": [
+          "17.0.4"
+        ]
+      }
+    }
+  ]
+}

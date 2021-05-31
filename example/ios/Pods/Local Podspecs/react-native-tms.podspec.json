@@ -1,0 +1,17 @@
+{
+  "name": "react-native-tms",
+  "version": "0.0.7",
+  "summary": "summary",
+  "description": "React Native apps are built using the React JS\nframework, and render directly to native UIKit\nelements using a fully asynchronous architecture.\nThere is no browser and no HTML. We have picked what\nwe think is the best set of features from these and\nother technologies to build what we hope to become\nthe best product development framework available,\nwith an emphasis on iteration speed, developer\ndelight, continuity of technology, and absolutely\nbeautiful and fast products with no compromises in\nquality or capability.",
+  "homepage": "http://www.terminus.io",
+  "license": "ISC",
+  "authors": "wuzhiyu",
+  "source": {
+    "git": "https://terminus-org.app.terminus.io/wb/mobile/react-native-tms"
+  },
+  "requires_arc": true,
+  "platforms": {
+    "ios": "9.0"
+  },
+  "source_files": "ios/RCTTMS/**/*.{h,m}"
+}
