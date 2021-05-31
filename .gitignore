@@ -103,5 +103,5 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 
-example/ios/Pods
-ios/Pods
+example/ios/Pods/
+ios/Pods/
