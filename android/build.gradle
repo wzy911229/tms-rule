@@ -1,61 +1,26 @@
-apply plugin: 'com.android.library'
-apply plugin: 'maven'
-
-ext {
-    PUBLISH_GROUP_ID = "io.github.wzy911229"        //项目包名
-    PUBLISH_ARTIFACT_ID = 'tms-rule'            //项目名
-    PUBLISH_VERSION = "0.0.2"                    //版本号
-}
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
     repositories {
-        jcenter() //指定maven镜像，下同
         google()
+        mavenCentral()
+        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
+        
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
-
-android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
-
-    defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 1
-        versionName "0.0.2"
-
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-
-    useLibrary 'org.apache.http.legacy'
 }
 
-
-repositories {
-    google()
-    mavenCentral()
-
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
-
-
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.code.gson:gson:2.8.5'
-}
-
-
-// apply from: file("./dependencyPlugin.gradle"); applyNativeModulesAppBuildGradle(project)
-
-apply from: "./publish-mavencentral.gradle"
