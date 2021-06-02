@@ -27,6 +27,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'io.github.wzy911229:tms-rule:0.0.4'
-
+    compile project(':tms')
 }

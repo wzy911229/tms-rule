@@ -31,6 +31,10 @@ public class TMSModulePlugin {
     private static Context _context;
 
     public static void init(Context mContext) {
+
+        if(_context != null){
+            return;
+        }
         _context = mContext;
 
         try {
