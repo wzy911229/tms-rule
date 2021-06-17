@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface LPDependenciesPlugin : NSObject<UIApplicationDelegate>
 
 +(id)configs;
-
++(void)startInit;
 
 @end
 

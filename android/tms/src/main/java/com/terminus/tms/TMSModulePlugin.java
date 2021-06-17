@@ -32,9 +32,6 @@ public class TMSModulePlugin {
 
     public static void init(Context mContext) {
 
-        if(_context != null){
-            return;
-        }
         _context = mContext;
 
         try {
@@ -181,10 +178,6 @@ public class TMSModulePlugin {
 
         try {
 
-
-
-
-
           SharedPreferences sp = mContext.getSharedPreferences("EnvSwitchConfig", MODE_PRIVATE);
           String localId = sp.getString(ENV_SWITCH_LOCAL_CONFIG_KEY, null);
 
@@ -211,32 +204,6 @@ public class TMSModulePlugin {
             config.put("tms",tms.values().toArray()[0]);
          }
 
-
-//          if (localId != null && configs != null ) {
-//              for(EnvComponent i: configs) {
-//                  if(localId.equals(i.getId()) && tms.containsKey(localId)){
-//                      Map<String, Object> r =  (Map<String, Object>)tms.get(localId);
-//                      config.put("tms",r);
-//
-//                      break;
-//                  }
-//              }
-//          }else if (configs != null) {
-//              for(EnvComponent i: configs) {
-//                  if(i.getDefault()){
-//                      Map<String, Object> r =  (Map<String, Object>)tms.get(i.getId());
-//                      config.put("tms",r);
-//                      break;
-//                  }
-//              }
-//
-//          }else if ( localId != null){
-//              Map<String, Object> r =  (Map<String, Object>)tms.get(localId);
-//              config.put("tms",r);
-//
-//          } else{
-//              config.put("tms",tms.values().toArray()[0]);
-//          }
 
 
 

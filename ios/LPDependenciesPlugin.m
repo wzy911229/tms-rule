@@ -12,11 +12,12 @@
 #import <stdarg.h>
 #include <mach-o/loader.h>
 #include <mach-o/getsect.h>
-// #import <rn-env/RCTESManager.h>
 
 static NSString *const kRCTESConfigurationKey = @"kRCTESConfigurationUserDefaultKey";
 
 static NSMutableArray<Class>* plugins;
+
+static NSDictionary* pConfig;
 
 @implementation LPDependenciesPlugin
 
@@ -42,63 +43,25 @@ static NSMutableArray<Class>* plugins;
 // start launch
 + (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // 解析配置文件
+        // 解析配置文件
      NSDictionary * config =  [self configs];
+     pConfig = config;
      plugins = [NSMutableArray array];
     
-    id tms = [config objectForKey:@"tms"];
-    id nconfig = [config objectForKey:@"nconfig"];
     NSDictionary* modules = [config objectForKey:@"modules"];
-    
     
     for (NSString *key in modules) {
         NSString *module = key;
         NSDictionary* moduleName  = [modules objectForKey:key];
         NSDictionary* iosConfig  =  [moduleName objectForKey:@"ios"] ? [moduleName objectForKey:@"ios"] : nil;
         NSArray* claszs = iosConfig ? [iosConfig objectForKey:@"mainclass"] : nil;
-        
-
-//        Class<LPPluginProtocol> clasz =  iosConfig ? NSClassFromString([iosConfig objectForKey:@"mainclass"]) : nil;
 
         if (!iosConfig || claszs.count == 0) {
             continue;
         }
         
         [plugins addObjectsFromArray:claszs];
-//        for (NSString * class in claszs) {
-//            Class<LPPluginProtocol> clasz =  NSClassFromString(class);
-//            if (claszs) {
-//                [plugins addObject:clasz];
-//            }
-//        }
-        
- 
-        //读取初始化参数
-        NSDictionary* dependencies = [tms objectForKey:@"dependencies"];
-        NSDictionary* channel = [tms objectForKey:@"channel"];
 
-        NSDictionary * moduleConfig = dependencies != nil ? [dependencies objectForKey:module] : nil;
-
-        NSDictionary* defaultArgs = moduleConfig != nil ? [moduleConfig objectForKey:@"args"] : nil;
-        NSArray* subspecs = moduleConfig != nil ? [moduleConfig objectForKey:@"subspecs"] : nil;
-        
-
-        
-        //是否有子渠道，有就需要合并渠道参数，并分别注册
-        if (subspecs && subspecs.count > 0) {
-            [subspecs enumerateObjectsUsingBlock:^(id  _Nonnull subspec, NSUInteger idx, BOOL * _Nonnull stop) {
-                NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:defaultArgs];
-                id channelParams = [channel objectForKey:subspec];
-                [params setObject:subspec forKey:@"channel"];
-                [params addEntriesFromDictionary:channelParams];
-                [self initEvent:claszs params:params];
-//                [[clasz sharedInstance] initEvent:params];
-            }];
-        }else{
-            [self initEvent:claszs params:defaultArgs];
-//            [[clasz sharedInstance] initEvent:defaultArgs];
-        }
-        
         [claszs enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             Class<LPPluginProtocol> clasz =  NSClassFromString(obj);
             if (claszs && [[clasz sharedInstance] respondsToSelector:@selector(application:didFinishLaunchingWithOptions:)]) {
@@ -109,63 +72,6 @@ static NSMutableArray<Class>* plugins;
     }
 
     
-//    // 获取所有遵守协议的类。
-////     plugins = [self pluginClasses:@protocol(LPPluginProtocol)];
-//    plugins =   pluginClasses();
-//
-//    [plugins enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-//
-//        id tms = [config objectForKey:@"tms"];
-//        id nconfig = [config objectForKey:@"nconfig"];
-//        NSDictionary* modules = [config objectForKey:@"modules"];
-//
-//
-//        if(tms == nil || nconfig == nil ){
-//            return;
-//        }
-//
-//        Class<LPPluginProtocol> clasz = obj;
-//
-//
-//        for (id value in modules) {
-//            NSString *module = [clasz tmsModuleName];
-//
-//        }
-//
-//
-//        NSString *module = [clasz tmsModuleName];
-//
-//        if (!module) {
-//            return;
-//        }
-//
-//        //读取初始化参数
-//        NSDictionary* dependencies = [tms objectForKey:@"dependencies"];
-//        NSDictionary* channel = [tms objectForKey:@"channel"];
-//
-//        NSDictionary * moduleConfig = dependencies != nil ? [dependencies objectForKey:module] : nil;
-//
-//        NSDictionary* defaultArgs = moduleConfig != nil ? [moduleConfig objectForKey:@"args"] : nil;
-//        NSArray* subspecs = moduleConfig != nil ? [moduleConfig objectForKey:@"subspecs"] : nil;
-//
-//        NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:defaultArgs];
-//
-//
-//        //是否有子渠道，有就需要合并渠道参数，并分别注册
-//        if (subspecs) {
-//            [subspecs enumerateObjectsUsingBlock:^(id  _Nonnull subspec, NSUInteger idx, BOOL * _Nonnull stop) {
-//                id channelParams = [channel objectForKey:subspec];
-//                [params setObject:subspec forKey:@"channel"];
-//                [params addEntriesFromDictionary:channelParams];
-//                [[clasz sharedInstance] initEvent:params];;
-//            }];
-//            return;
-//        }
-//
-//        [[clasz sharedInstance] initEvent:params];;
-//
-//    }];
-//
     return  true;
 }
 
@@ -280,6 +186,57 @@ continueUserActivity:(nonnull NSUserActivity *)userActivity
 
 #pragma mark - init
 
++ (void)startInit {
+    if (!pConfig) {
+        return;
+    }
+    
+    id tms = [pConfig objectForKey:@"tms"];
+    id nconfig = [pConfig objectForKey:@"nconfig"];
+    NSDictionary* modules = [pConfig objectForKey:@"modules"];
+    
+    
+    for (NSString *key in modules) {
+        NSString *module = key;
+        NSDictionary* moduleName  = [modules objectForKey:key];
+        NSDictionary* iosConfig  =  [moduleName objectForKey:@"ios"] ? [moduleName objectForKey:@"ios"] : nil;
+        NSArray* claszs = iosConfig ? [iosConfig objectForKey:@"mainclass"] : nil;
+
+        if (!iosConfig || claszs.count == 0) {
+            continue;
+        }
+        
+
+        //读取初始化参数
+        NSDictionary* dependencies = [tms objectForKey:@"dependencies"];
+        NSDictionary* channel = [tms objectForKey:@"channel"];
+
+        NSDictionary * moduleConfig = dependencies != nil ? [dependencies objectForKey:module] : nil;
+
+        NSDictionary* defaultArgs = moduleConfig != nil ? [moduleConfig objectForKey:@"args"] : nil;
+        NSArray* subspecs = moduleConfig != nil ? [moduleConfig objectForKey:@"subspecs"] : nil;
+        
+
+        
+        //是否有子渠道，有就需要合并渠道参数，并分别注册
+        if (subspecs && subspecs.count > 0) {
+            [subspecs enumerateObjectsUsingBlock:^(id  _Nonnull subspec, NSUInteger idx, BOOL * _Nonnull stop) {
+                NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:defaultArgs];
+                id channelParams = [channel objectForKey:subspec];
+                [params setObject:subspec forKey:@"channel"];
+                [params addEntriesFromDictionary:channelParams];
+                [self initEvent:claszs params:params];
+            }];
+        }else{
+            [self initEvent:claszs params:defaultArgs];
+        }
+        
+    }
+
+}
+
+
+
 
 + (NSDictionary*)configs {
     
@@ -297,26 +254,6 @@ continueUserActivity:(nonnull NSUserActivity *)userActivity
     
     NSString *envId = [[NSUserDefaults standardUserDefaults] stringForKey:kRCTESConfigurationKey];
     NSMutableDictionary * resultTms = [NSMutableDictionary dictionary];
-
-//   __block  NSMutableDictionary * resultTms = [NSMutableDictionary dictionary];
-    // if (envId && configs ) {
-    //     [configs enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-    //         RCTESComponent *component = obj;
-    //         if ([component.id isEqualToString: envId]) {
-    //             resultTms = [defaultTMSMap objectForKey:envId];
-    //             *stop = YES;
-    //         }
-    //     }];
-    // }else if (configs) {
-    //     [configs enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-    //         RCTESComponent *component = obj;
-    //         if (component.isDefault) {
-    //             resultTms = [defaultTMSMap objectForKey:component.id];
-    //             *stop = YES;
-    //         }
-    //     }];
-        
-    // }else
     
     if (envId) {
         resultTms = [defaultTMSMap objectForKey:envId];
@@ -338,22 +275,6 @@ continueUserActivity:(nonnull NSUserActivity *)userActivity
         }
     }];
 }
-
-
-
-
-//+ (NSString*)check:(NSDictionary*)iosModuleNames obj:(Class _Nonnull) obj {
-//
-//     __block  NSString* nameKey = nil;
-//    [iosModuleNames.allKeys enumerateObjectsUsingBlock:^(NSString*  _Nonnull key , NSUInteger idx, BOOL * _Nonnull stop) {
-//        if ([NSStringFromClass(obj) isEqualToString:[iosModuleNames objectForKey:key]]) {
-//            nameKey = key;
-//            return;
-//        }
-//    }];
-//    return nameKey;
-//
-//}
 
 
 NSArray<Class>* pluginClasses() {
@@ -379,27 +300,6 @@ NSArray<Class>* pluginClasses() {
    return [collection copy];
 }
 
-//+ (NSArray<Class>*)pluginClasses:(Protocol * _Nullable) protocol{
-//
-//
-//    int classCount = objc_getClassList(nil, 0);
-//    if (classCount <= 0 ) {
-//        return nil;
-//    }
-//    NSMutableArray *collection = [NSMutableArray array];
-//
-//    Class* classes = (__unsafe_unretained Class*)malloc(sizeof(Class) * classCount);
-//    classCount = objc_getClassList(classes, classCount);
-//
-//    for (int index = 0; index < classCount; index++) {
-//           Class aClass = classes[index];
-//           if (class_conformsToProtocol(aClass, protocol)) {
-//               [collection addObject:aClass];
-//           }
-//    }
-//   free(classes);
-//   return [collection copy];
-//
-//}
 
 @end
+
