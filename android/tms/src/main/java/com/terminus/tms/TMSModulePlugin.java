@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
+import android.os.Bundle;
 
 
 import java.io.BufferedReader;
@@ -19,8 +20,6 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-
-
 import static android.content.Context.MODE_PRIVATE;
 
 
@@ -29,18 +28,28 @@ public class TMSModulePlugin {
     private static Map<String, Object> config ;
     private static final String ENV_SWITCH_LOCAL_CONFIG_KEY = "env.switch.config";
     private static Context _context;
+    private static boolean _inited;
+
 
     public static void init(Context mContext) {
 
+        //限制初始化调用一次
+        if (_inited && !(mContext instanceof Application)){
+            return;
+        }
+
+        _inited = true;
         _context = mContext;
 
         try {
-            config = readConfig(mContext);
-
-
+            config = config != null ? config : readConfig(mContext);
             Map<String, Object> modules = (Map<String, Object>) config.get("modules");
             Map<String, Object> tms = (Map<String, Object>) config.get("tms");
             Map<String, Object> nconfig = (Map<String, Object>) config.get("nconfig");
+
+            if(tms.containsKey("userProtocol") && (boolean)tms.get("userProtocol")){
+                return;
+            }
 
             Map<String, Object> dependencies = (Map<String, Object>) tms.get("dependencies");
 
@@ -49,7 +58,6 @@ public class TMSModulePlugin {
                 Map<String, Object> clazzNames = (Map<String, Object>)modules.get(module);
                 Map<String, Object>  androidConfigs = clazzNames != null && clazzNames.size()>0 ? (Map<String, Object>)clazzNames.get("android") : null;
                 List<String> classes = androidConfigs != null ? (List)androidConfigs.get("mainclass") : null;
-
 
                 if ( classes == null || classes.size() == 0 ){
                     continue;
@@ -113,7 +121,6 @@ public class TMSModulePlugin {
         Map<String, Object> map = new HashMap<String, Object>();
 
         try {
-
             config = gson.fromJson(getJson("tmsConfig.json",_context), map.getClass());
 
             Map<String, Object> modules = (Map<String, Object>) config.get("modules");
@@ -142,7 +149,6 @@ public class TMSModulePlugin {
     }
 
     public static void handleResult(Object args) {
-
 
     }
 
@@ -174,7 +180,7 @@ public class TMSModulePlugin {
     }
 
 
-    private static Map<String, Object> readConfig(Context mContext) {
+    public static Map<String, Object> readConfig(Context mContext) {
 
         try {
 
@@ -204,11 +210,7 @@ public class TMSModulePlugin {
             config.put("tms",tms.values().toArray()[0]);
          }
 
-
-
-
         } catch (Exception e) {
-
 
         }
 
@@ -216,8 +218,7 @@ public class TMSModulePlugin {
 
     }
 
-
-    private static boolean isDebugApk(Context mContext) {
+    public static boolean isDebugApk(Context mContext) {
         ApplicationInfo info = mContext.getApplicationInfo();
         if ((info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
             return true;
@@ -226,8 +227,7 @@ public class TMSModulePlugin {
     }
 
 
-
-    private static String getJson(String fileName, Context context){
+    private static String getJson(String fileName, Context context) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             //获取assets资源管理器

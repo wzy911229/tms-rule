@@ -4,7 +4,7 @@ apply plugin: 'com.android.library'
 ext {
     PUBLISH_GROUP_ID = "io.github.wzy911229"        //项目包名
     PUBLISH_ARTIFACT_ID = 'tms-rule'            //项目名
-    PUBLISH_VERSION = "0.0.7"                    //版本号
+    PUBLISH_VERSION = "0.0.8"                    //版本号
 }
 
 
@@ -16,7 +16,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
-        versionName "0.0.7"
+        versionName "0.0.8"
 
     }
 

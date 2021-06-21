@@ -47,6 +47,12 @@ static NSDictionary* pConfig;
      NSDictionary * config =  [self configs];
      pConfig = config;
      plugins = [NSMutableArray array];
+     
+     NSDictionary*  tms = [config objectForKey:@"tms"];
+    
+    if (tms && ![tms objectForKey:@"userProtocol"]) {
+        [self startInit];
+    }
     
     NSDictionary* modules = [config objectForKey:@"modules"];
     
@@ -70,13 +76,11 @@ static NSDictionary* pConfig;
         }];
         
     }
-
-    
     return  true;
 }
 
 // push
-+ (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken{
++ (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     
     [plugins enumerateObjectsUsingBlock:^(id _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         Class<LPPluginProtocol> clasz = NSClassFromString(obj);
@@ -187,13 +191,15 @@ continueUserActivity:(nonnull NSUserActivity *)userActivity
 #pragma mark - init
 
 + (void)startInit {
-    if (!pConfig) {
+    NSDictionary * dict = pConfig ? pConfig : [self configs];
+    
+    if (!dict) {
         return;
     }
     
-    id tms = [pConfig objectForKey:@"tms"];
-    id nconfig = [pConfig objectForKey:@"nconfig"];
-    NSDictionary* modules = [pConfig objectForKey:@"modules"];
+    id tms = [dict objectForKey:@"tms"];
+    id nconfig = [dict objectForKey:@"nconfig"];
+    NSDictionary* modules = [dict objectForKey:@"modules"];
     
     
     for (NSString *key in modules) {
