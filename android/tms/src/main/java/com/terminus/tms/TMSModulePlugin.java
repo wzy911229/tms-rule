@@ -30,14 +30,31 @@ public class TMSModulePlugin {
     private static Context _context;
     private static boolean _inited;
 
+    public static void init(Context content) {
 
-    public static void init(Context mContext) {
+        //限制初始化调用一次
+        if (_inited && !(content instanceof Application)){
+            return;
+        }
+
+        config = config != null ? config : readConfig(content);
+        Map<String, Object> tms = (Map<String, Object>) config.get("tms");
+
+        if(tms.containsKey("userProtocol") && (boolean)tms.get("userProtocol")){
+            return;
+        }
+
+        startInit(content);
+
+    }
+
+
+    public static void startInit(Context mContext) {
 
         //限制初始化调用一次
         if (_inited && !(mContext instanceof Application)){
             return;
         }
-
         _inited = true;
         _context = mContext;
 
@@ -47,10 +64,6 @@ public class TMSModulePlugin {
             Map<String, Object> tms = (Map<String, Object>) config.get("tms");
             Map<String, Object> nconfig = (Map<String, Object>) config.get("nconfig");
 
-            if(tms.containsKey("userProtocol") && (boolean)tms.get("userProtocol")){
-                return;
-            }
-
             Map<String, Object> dependencies = (Map<String, Object>) tms.get("dependencies");
 
 
@@ -59,7 +72,7 @@ public class TMSModulePlugin {
                 Map<String, Object>  androidConfigs = clazzNames != null && clazzNames.size()>0 ? (Map<String, Object>)clazzNames.get("android") : null;
                 List<String> classes = androidConfigs != null ? (List)androidConfigs.get("mainclass") : null;
 
-                if ( classes == null || classes.size() == 0 ){
+                if ( classes == null || classes.size() == 0 ) {
                     continue;
                 }
 
