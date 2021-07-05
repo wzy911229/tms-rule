@@ -36,6 +36,18 @@ void call_AppDelegate_Plugins(SEL _cmd_, id _application_, id _args1_, id _args2
   
 }
 
+NSUInteger LP_Appdelegate_inter_method_return(id _self_, SEL _cmd_, id _application_, id _args1_, id _args2_, id _args3_) {
+    NSUInteger returnValue = NO;
+    SEL LP_selector = NSSelectorFromString([NSString stringWithFormat:@"LP_%@", NSStringFromSelector(_cmd_)]);
+    Method m = class_getClassMethod([LPAppDelegatePlugin class], LP_selector);
+    IMP method = method_getImplementation(m);
+    if (![NSStringFromSelector(_cmd_) hasPrefix:@"LP_"]) {
+        NSUInteger (* callMethod)(id,SEL,id,id,id,id) = (void *)method;
+        returnValue = callMethod(_self_,LP_selector,_application_,_args1_,_args2_,_args3_);
+    }
+   call_AppDelegate_Plugins(_cmd_, _application_, _args1_, _args2_, _args3_);
+    return returnValue;
+}
 
 BOOL LP_Appdelegate_method_return(id _self_, SEL _cmd_, id _application_, id _args1_, id _args2_, id _args3_) {
     BOOL returnValue = NO;
@@ -278,7 +290,7 @@ void Swizzle(Class class, SEL originalSelector, Method swizzledMethod)
 
 
 + (void)LP_application:(UIApplication *)application didFailToContinueUserActivityWithType:(nonnull NSString *)userActivityType error:(nonnull NSError *)error {
-    LP_Appdelegate_method(self, _cmd, application, userActivityType,  nil);
+    LP_Appdelegate_method(self, _cmd, application, userActivityType,  error);
 }
 
 + (void)LP_application:(UIApplication *)application didUpdateUserActivity:(nonnull NSUserActivity *)userActivity {
@@ -336,22 +348,22 @@ void Swizzle(Class class, SEL originalSelector, Method swizzledMethod)
 
 
 + (BOOL)LP_application:(UIApplication *)application viewControllerWithRestorationIdentifierPath:(nonnull NSArray<NSString *> *)identifierComponents coder:(nonnull NSCoder *)coder{
-  return  LP_Appdelegate_method_return(self, _cmd, identifierComponents, coder, nil, nil);
+  return  LP_Appdelegate_method_return(self, _cmd, application, identifierComponents, coder, nil);
 
 }
 
 + (BOOL)LP_application:(UIApplication *)application shouldSaveApplicationState:(nonnull NSCoder *)coder{
-   return LP_Appdelegate_method_return(self, _cmd, coder, nil, nil, nil);
+   return LP_Appdelegate_method_return(self, _cmd, application, coder, nil, nil);
 
 }
 
 + (BOOL)LP_application:(UIApplication *)application shouldRestoreSecureApplicationState:(nonnull NSCoder *)coder{
-  return LP_Appdelegate_method_return(self, _cmd, coder, nil, nil, nil);
+  return LP_Appdelegate_method_return(self, _cmd, application, coder, nil, nil);
 }
 
 
 +  (BOOL)LP_application:(UIApplication *)application shouldSaveSecureApplicationState:(NSCoder *)coder {
-    return LP_Appdelegate_method_return(self, _cmd, coder, nil, nil, nil);
+    return LP_Appdelegate_method_return(self, _cmd, application, coder, nil, nil);
 
 }
 
@@ -384,7 +396,7 @@ void Swizzle(Class class, SEL originalSelector, Method swizzledMethod)
 }
 
 + (nullable id)LP_application:(UIApplication *)application handlerForIntent:(INIntent *)inten{
-  return   LP_Appdelegate_method_obj_return(self, _cmd, inten, nil, nil, nil);
+  return   LP_Appdelegate_method_obj_return(self, _cmd, application, inten, nil, nil);
 }
 
 
@@ -405,20 +417,20 @@ void Swizzle(Class class, SEL originalSelector, Method swizzledMethod)
 #pragma mark - shortcutItem
 
 + (void)LP_application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void(^)(BOOL succeeded))completionHandler {
-  LP_Appdelegate_method(self, _cmd, shortcutItem, nil, completionHandler);
+  LP_Appdelegate_method(self, _cmd, application, shortcutItem, completionHandler);
 
 }
 
 
 + (void)LP_application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
-  LP_Appdelegate_method(self, _cmd, nil, nil, completionHandler);
+  LP_Appdelegate_method(self, _cmd, application, completionHandler, nil );
 
 }
 
 #pragma mark - CloudKit
 
 + (void)LP_application:(UIApplication *)application userDidAcceptCloudKitShareWithMetadata:(CKShareMetadata *)cloudKitShareMetadata {
-  LP_Appdelegate_method(self, _cmd, cloudKitShareMetadata, nil, nil);
+   LP_Appdelegate_method(self, _cmd, application, cloudKitShareMetadata, nil);
 }
 
 
@@ -426,13 +438,13 @@ void Swizzle(Class class, SEL originalSelector, Method swizzledMethod)
 
 
 + (void)LP_application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions API_AVAILABLE(ios(13.0)){
-  LP_Appdelegate_method(self, _cmd, sceneSessions, nil, nil);
+     LP_Appdelegate_method(self, _cmd, application, sceneSessions, nil);
 
 }
 
 
 + (UIInterfaceOrientationMask)LP_application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(nullable UIWindow *)window{
-    return  LP_Appdelegate_method_obj_return(self, _cmd, window, nil, nil, nil);
+    return  LP_Appdelegate_inter_method_return(self, _cmd, application, window, nil, nil);
 }
 
 
