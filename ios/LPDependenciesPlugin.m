@@ -50,7 +50,7 @@ static NSDictionary* pConfig;
      
      NSDictionary*  tms = [config objectForKey:@"tms"];
     
-    if (tms && ![tms objectForKey:@"userProtocol"]) {
+    if (tms && (![tms.allKeys containsObject:@"userProtocol"] || ![[tms objectForKey:@"userProtocol"] boolValue])) {
         [self startInit];
     }
     
